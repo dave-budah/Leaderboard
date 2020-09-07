@@ -20,8 +20,12 @@ import java.util.*
 
 private const val ARG_PARAM_TYPE = "alert_type"
 
-
-class AlertFragment : DialogFragment(){
+/**
+ * A simple [Fragment] subclass.
+ * Use the [AlertFragment.newInstance] factory method to
+ * create an instance of this fragment.
+ */
+class AlertFragment : DialogFragment() {
 
     private var mAlertType: String? = null
     private lateinit var mBinding: FragmentAlertBinding
@@ -32,6 +36,13 @@ class AlertFragment : DialogFragment(){
         fun onConfirmed()
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            mAlertType = it.getString(ARG_PARAM_TYPE)
+        }
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         mBinding = DataBindingUtil.inflate(
             LayoutInflater.from(context),
@@ -39,18 +50,20 @@ class AlertFragment : DialogFragment(){
             null,
             false
         )
-        mBinding.type = mAlertType
-        return activity?.let {
-            val builder = AlertDialog.Builder(it)
 
-            mBinding.ibCancel.setOnClickListener{
+        mBinding.type = mAlertType
+
+        return activity?.let {
+            val builder = androidx.appcompat.app.AlertDialog.Builder(it)
+
+            mBinding.ibCancel.setOnClickListener {
+                dismiss()
+            }
+            mBinding.btnYes.setOnClickListener {
                 listener.onConfirmed()
                 dismiss()
             }
-            mBinding.btnYes.setOnClickListener{
-                listener.onConfirmed()
-                dismiss()
-            }
+
             builder.setView(mBinding.root)
             builder.setCancelable(mAlertType != "confirmation")
             builder.create()
@@ -74,16 +87,23 @@ class AlertFragment : DialogFragment(){
         } catch (e: ClassCastException) {
             throw ClassCastException(
                 (context.toString() +
-                        "must implement OnRequestConfirmationListener")
+                        " must implement OnRequestConfirmationListener")
             )
         }
     }
 
     companion object {
+        /**
+         * Use this factory method to create a new instance of
+         * this fragment using the provided parameters.
+         *
+         * @param alertType Parameter 1.
+         * @return A new instance of fragment AlertFragment.
+         */
         @JvmStatic
         fun newInstance(alertType: String) =
             AlertFragment().apply {
-                arguments = Bundle ().apply {
+                arguments = Bundle().apply {
                     putString(ARG_PARAM_TYPE, alertType)
                 }
             }

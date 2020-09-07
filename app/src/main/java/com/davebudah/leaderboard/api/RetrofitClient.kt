@@ -10,9 +10,8 @@ class RetrofitClient {
         private var FORM_INSTANCE: Api? = null
         private const val BASE_URL = "https://gadsapi.herokuapp.com/api/"
 
-        fun getInstance(): Api {
-            Log.d("Response", "fun getInstance(): Api {")
 
+        fun getInstance(): Api {
             if (INSTANCE == null) {
                 Log.d("Response", "instantiating...")
                 val retrofit = Retrofit.Builder()
@@ -27,7 +26,6 @@ class RetrofitClient {
         }
 
         fun getFormInstance(): Api {
-            Log.d("Response", "fun getFormInstance(): Api {")
             if (FORM_INSTANCE == null) {
                 val retrofit = Retrofit.Builder()
                     .baseUrl("https://docs.google.com/forms/d/e/")

@@ -1,6 +1,7 @@
 package com.davebudah.leaderboard
 
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -14,9 +15,9 @@ import retrofit2.Response
 
 class SubmitActivity : AppCompatActivity(), AlertFragment.OnRequestConfirmationListener {
 
-    private lateinit var lName: String
-    private lateinit var fName: String
-    private lateinit var eAddress: String
+    private lateinit var lastName: String
+    private lateinit var firstName: String
+    private lateinit var emailAddress: String
     private lateinit var repoLink: String
     private lateinit var mBinding: ActivitySubmitBinding
 
@@ -28,41 +29,44 @@ class SubmitActivity : AppCompatActivity(), AlertFragment.OnRequestConfirmationL
         mBinding.clearForm = false
 
         events()
-
     }
+
     override fun onConfirmed() {
         processForm()
     }
-    private fun events () {
-        mBinding.backBtn.setOnClickListener{ onBackPressed()}
-        mBinding.buttonSubmit.setOnClickListener{ confirm()}
+
+    private fun events() {
+        mBinding.backBtn.setOnClickListener { onBackPressed() }
+        mBinding.buttonSubmit.setOnClickListener { confirm() }
     }
 
     private fun confirm() {
-        fName = mBinding.firstName.text.toString().trim()
-        lName = mBinding.lastName.text.toString().trim()
-        eAddress = mBinding.emailAddress.text.toString().trim()
+        firstName = mBinding.firstName.text.toString().trim()
+        lastName = mBinding.lastName.text.toString().trim()
+        emailAddress = mBinding.emailAddress.text.toString().trim()
         repoLink = mBinding.projectLink.text.toString().trim()
 
-        if (fName.isEmpty() || lName.isEmpty() || eAddress.isEmpty() || repoLink.isEmpty()) {
-            show(message = "Please flood all input fields")
+        if (firstName.isEmpty() || lastName.isEmpty() || emailAddress.isEmpty() || repoLink.isEmpty()) {
+            show(message = "All fields are required.")
             return
         }
-        if (!eAddress.isValidEmail()) {
+
+        if (!emailAddress.isValidEmail()) {
             show(message = "Enter a valid email address.")
             return
         }
+
         if (!repoLink.isValidUrl()) {
             show(message = "Enter a valid URL.")
             return
         }
 
         AlertFragment.newInstance("confirmation").show(supportFragmentManager, "")
-
     }
+
     private fun processForm() {
         mBinding.loading = true
-        RetrofitClient.getFormInstance().submit(fName, lName, eAddress, repoLink)
+        RetrofitClient.getFormInstance().submit(firstName, lastName, emailAddress, repoLink)
             .enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     mBinding.loading = false
@@ -78,6 +82,7 @@ class SubmitActivity : AppCompatActivity(), AlertFragment.OnRequestConfirmationL
             })
 
     }
+
     private fun String.isValidUrl(): Boolean = Patterns.WEB_URL.matcher(this).matches()
 
     private fun String.isValidEmail(): Boolean =
